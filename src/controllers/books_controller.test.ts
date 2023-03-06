@@ -139,20 +139,22 @@ describe("DELETE /api/v1/books/{bookId} endpoint", () => {
 		// Arrange
 		jest
 			.spyOn(bookService, "deleteBook")
+			.mockResolvedValue(1); // 1 will be retrned if a book found and been deleted
 		// Act
 		const res = await request(app).delete("/api/v1/books/1");
 		// Assert
 		expect(res.statusCode).toEqual(200);
 	});
+	test("status code successfully 200 for a book that is found and been deleted", async () => {
 
-	test("status code successfully 200 for a book that is not found for deletion", async () => {
 		// Arrange
 		jest
 			.spyOn(bookService, "deleteBook")
+			.mockResolvedValue(0); // 0 will be retrned if no book found
 		// Act
-		const res = await request(app).delete("/api/v1/books/122");
+		const res = await request(app).delete("/api/v1/books/155");
 		// Assert
-		expect(res.statusCode).toEqual(200);
+		expect(res.statusCode).toEqual(404);
 	});
 	 
 });
