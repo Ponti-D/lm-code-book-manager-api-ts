@@ -109,6 +109,10 @@ describe("GET /api/v1/books/{bookId} endpoint", () => {
 
 describe("POST /api/v1/books endpoint", () => {
 	test("status code successfully 201 for saving a valid book", async () => {
+		// Arrange
+		jest
+			.spyOn(bookService, "getBook")
+			.mockResolvedValue(undefined as unknown as Book);
 		// Act
 		const res = await request(app)
 			.post("/api/v1/books")
@@ -132,29 +136,36 @@ describe("POST /api/v1/books endpoint", () => {
 		// Assert
 		expect(res.statusCode).toEqual(400);
 	});
+	test("status code 400 error trying to save a book that already exist", async () => {
+		// Arrange
+		jest
+			.spyOn(bookService, "getBook")
+			.mockResolvedValue(dummyBookData[1] as Book);
+		// Act
+		const res = await request(app)
+			.post("/api/v1/books")
+			.send({ bookId: 2, title: "Fantastic Mr. Fox", author: "Roald Dahl" });
+
+		// Assert
+		expect(res.statusCode).toEqual(400);
+	});
 });
 
 describe("DELETE /api/v1/books/{bookId} endpoint", () => {
 	test("status code successfully 200 for a book that is found and been deleted", async () => {
 		// Arrange
-		jest
-			.spyOn(bookService, "deleteBook")
-			.mockResolvedValue(1); // 1 will be retrned if a book found and been deleted
+		jest.spyOn(bookService, "deleteBook").mockResolvedValue(1); // 1 will be retrned if a book found and been deleted
 		// Act
 		const res = await request(app).delete("/api/v1/books/1");
 		// Assert
 		expect(res.statusCode).toEqual(200);
 	});
 	test("status code successfully 200 for a book that is found and been deleted", async () => {
-
 		// Arrange
-		jest
-			.spyOn(bookService, "deleteBook")
-			.mockResolvedValue(0); // 0 will be retrned if no book found
+		jest.spyOn(bookService, "deleteBook").mockResolvedValue(0); // 0 will be retrned if no book found
 		// Act
 		const res = await request(app).delete("/api/v1/books/155");
 		// Assert
 		expect(res.statusCode).toEqual(404);
 	});
-	 
 });
